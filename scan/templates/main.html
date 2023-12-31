@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opencv JS</title>
+	 <!-- Load opencv.js asynchronously.  -->
+	<script> function onOpenCvReady(){console.log( 'OpenCV Ready', cv);}</script>
+	<!-- Load opencv.js core  -->
+    <script async src="https://docs.opencv.org/4.5.0/opencv.js" onload="openCvReady();"></script>
+	
+	
+
+	<!-- Load utils.js   -->	
+    <script src="/static/_scaner/js/utils.js"></script>
+    <style>
+   #canvasContainer { position:relative; width:480px; height:480px; }
+   #canvas_output { position:relative; width: 100%; height: 100%; z-index:1;  }
+   #svgContainer { position:absolute; width:360px; height:360px; z-index:2; bottom: 60px; left: 60px; }
+   
+@media screen and (orientation:portrait) { #cam_input { width: 480px; height: 640px; display: none; object-fit: cover } }
+@media screen and (orientation:landscape) { #cam_input { width: 640px; height: 480px; display: none; object-fit: cover } } 
+    </style>
+</head>
+<body>
+
+<div id="canvasContainer">
+    <canvas id="canvas_output"></canvas>
+    <img id="svgContainer" src="/static/_scaner/mask.svg" alt="Patch Mask"/>
+    <video hidden="hidden" id="cam_input" height="100%" width="100%" playsinline=true></video><!-- playsinline=true  - for ios   -->
+</div>
+	<!-- Load opencv.js core  -->
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="Capture and Upload" id="captureButton"/></p>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const canvas = document.getElementById("canvas_output");
+            const context = canvas.getContext("2d");
+            const captureButton = document.getElementById("captureButton");
+            captureButton.addEventListener("click", function () {
+                const canvasDataUrl = canvas.toDataURL("image/png");
+                document.querySelector('#id_base64_data').value = canvasDataUrl;
+            });
+        });
+    </script>
+</body>
+	<!-- Load opencv.js core  -->
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+
+<script type="text/JavaScript">
+function openCvReady() {
+  cv['onRuntimeInitialized']=()=>{
+    let video = document.getElementById("cam_input"); // video is the id of video tag
+	let maskInv = new cv.Mat();
+    let imgBg = new cv.Mat();
+    let imgFg = new cv.Mat();
+    let sum = new cv.Mat();
+	
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(function(stream) {
+        video.srcObject = stream;
+        video.play();
+    })
+    .catch(function(err) {
+        console.log("An error occurred! " + err);
+    });
+    let src = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+    //let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
+    let cap = new cv.VideoCapture(cam_input);
+    let utils = new Utils('errorMessage');
+    const FPS = 30;
+	
+    function processVideo() 
+		{
+        let begin = Date.now();
+        cap.read(src);
+		//cv.bitwise_and(src, src, imgBg, maskInv);
+        //cv.add(imgBg, imgFg, sum);
+        //src.copyTo(dst);
+		let rect = new cv.Rect(0, 0, 480, 480);
+		dst = src.roi(rect);
+        cv.imshow("canvas_output", dst);
+		//src.delete();
+		//dst.delete();
+        // schedule next one.
+        let delay = 1000/FPS - (Date.now() - begin);
+        setTimeout(processVideo, delay);
+			
+		};
+// schedule first one.
+setTimeout(processVideo, 0);
+  };
+}
+</script>
+
+</html>
+
