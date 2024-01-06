@@ -8,8 +8,7 @@ Demo video:
 [![DEMO](https://img.youtube.com/vi/iYU6fqf6X8M/0.jpg)](https://www.youtube.com/shorts/iYU6fqf6X8M)
 
 KiCad 3d wiew:
-https://raw.githubusercontent.com/sanderlt/bodypatch/main/hands_and_patch.jpg
- <img alt="KiCad 3d View:" src="https://raw.githubusercontent.com/sanderlt/bodypatch/main/media/1.png"  width='480'>
+ <img alt="KiCad 3d View:" src="https://raw.githubusercontent.com/sanderlt/bodypatch/main/hands_and_patch.jpg"  width='480'>
 
 Article on Medium https://medium.com/@letetski/colorimetry-and-computer-vision-b9a5f312d8a8
 
